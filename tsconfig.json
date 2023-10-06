@@ -20,5 +20,7 @@
 //      "@src/*": ["src/*"],
 //      "@common/*": ["src/common/*"]
 //    }
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
 }

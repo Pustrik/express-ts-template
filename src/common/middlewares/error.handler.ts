@@ -1,7 +1,8 @@
 import { Express, NextFunction, Request, Response } from 'express';
 import logger from '../utils/logger.util';
-import { CustomException } from '../exceptions';
+import { ConflictException, CustomException } from '../exceptions';
 import { messageUtil } from '../utils/messages.util';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export class ErrorHandler {
   constructor(app: Express) {
@@ -15,8 +16,10 @@ export class ErrorHandler {
     res: Response,
     next: NextFunction,
   ) => {
+    if (error instanceof PrismaClientKnownRequestError)
+      error = new ConflictException(`Must be unique: ${error.meta.target}`);
     if (!(error instanceof CustomException)) {
-      logger.error(error, 'Server error');
+      logger.error(error, messageUtil.exceptions.internal);
       return next(error);
     }
     logger.error(
